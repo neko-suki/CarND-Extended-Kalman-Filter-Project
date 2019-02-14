@@ -1,5 +1,5 @@
 #include "kalman_filter.h"
-
+#include<iostream>
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
@@ -51,22 +51,22 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    * TODO: update the state by using Extended Kalman Filter equations
    */
     // KF Measurement update step
-    //double px = x_(0);
-    //double py = x_(1);
-    //double vx = x_(2);
-    //double vy = x_(3);
+    double px = x_(0);
+    double py = x_(1);
+    double vx = x_(2);
+    double vy = x_(3);
 
-    //MatrixXd tmp_x(3, 1);
-    //tmp_x << sqrt(px*px + py*py), atan2(py, px), (px*vx + py*vy) / sqrt(px*px + py*py);
+    MatrixXd tmp_z(3, 1);
+    tmp_z << sqrt(px*px + py*py),  atan2(py, px), (px*vx + py*vy) / sqrt(px*px + py*py);
 
-    MatrixXd y_ = z - H_ * z;
+    MatrixXd y_ = z - tmp_z;
     MatrixXd S_ = H_ * P_ * H_.transpose() + R_;
     MatrixXd K_ = P_ * H_.transpose() * S_.inverse();
-    MatrixXd I = MatrixXd::Identity(2, 2);
+    MatrixXd I = MatrixXd::Identity(4, 4);
 
+    if (y_(1) < -M_PI)y_(1) += 2*M_PI;
+    if (M_PI < y_(1))y_(1) -= 2*M_PI;
     // new state
     x_ = x_ + K_ * y_;
     P_ = (I - K_ * H_) * P_;
-
-
 }

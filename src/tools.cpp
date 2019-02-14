@@ -18,6 +18,9 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   // check the validity of the following inputs:
   //  * the estimation vector size should not be zero
   //  * the estimation vector size should equal ground truth vector size
+  if (estimations.size() == 0 || estimations.size() != ground_truth.size()){
+    return rmse;
+  }
 
   // TODO: accumulate squared residuals
   for (int i=0; i < estimations.size(); ++i) {
@@ -52,8 +55,16 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   // pre-compute a set of terms to avoid repeated calculation
   float c1 = px*px+py*py;
   float c2 = sqrt(c1);
-  float c3 = (c1*c2);
+  float c3 = c1*c2;
 
+  if (fabs(c2) < 0.0001){
+    std::cout << "CalculateJacobian () - Error - Division by Zero" << std::endl;
+    return Hj;
+  }
+  if (fabs(c3) < 0.0001){
+    std::cout << "CalculateJacobian () - Error - Division by Zero" << std::endl;
+    return Hj;
+  }
   // check division by zero
   if (fabs(c1) < 0.0001) {
     std::cout << "CalculateJacobian () - Error - Division by Zero" << std::endl;
